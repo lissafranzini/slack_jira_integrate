@@ -1,14 +1,14 @@
 # slack_jira_integrate
 This project is an AWS Lambda function that listens to events from a specific Slack channel and creates Jira issues based on the received messages.<br>
-It is usefull to integrate slack channels that are used to notify alerts or incidents that will require action or analysis from a specific team, that will automatically have this demand regirested in their Jira project.<br>
+It is usefull for integrating slack channels used to notify alerts or incidents, automatically registering it as a demand (Jira issue) for the team to action or analyze.<br>
 
 <br>
 
-## Functionalities:<br>
+## Features:<br>
 * Create Jira issue form message received in specific slack channel<br>
 * Checks if a Jira card already exists for the received event, avoiding duplicates<br>
 * Replies slack thread with the link to the newly created issue<br>
-* Uses first line of the message as summary for the Jira issue, if getting the first line returns in errors (eg: message is ans image) it uses message timestamp as summary<br>
+* Uses first line of the message as the Jira issue's summary. If the first line can't be retrieved (e.g.: message is an image), it uses message timestamp as summary<br>
 <br>
 
 ## Pre-requisites:<br>
@@ -20,14 +20,14 @@ It is usefull to integrate slack channels that are used to notify alerts or inci
 <br>
 
 * Slack App setup:<br>
-  * App creation: create an app and install it in you workspace (you will need admin permission to do that).<br>
+  * App creation: create an app and install it in your workspace (you will need admin permission to do that).<br>
   * Slack OAuth Token: generate a token in your app settings.<br>
   * Scopes: OAuth scopes required for this project are chat:write, chat:read and channels:join.<br>
-  * Event subscription: set up the Request URL in Slack to point to the AWS API Gateway endpoint that triggers this Lambda function, and subscripte to message.channels events.<br>
+  * Event subscription: set up the Request URL in Slack to point to the AWS API Gateway endpoint that triggers your Lambda function, and subscripte to message.channels event.<br>
 <br>
 * AWS Lambda setup:<br>
-  * Lambda function: create a lambda function with python 3.12 as runtime, no advanced settings are needed.<br>
-  * API gateway: set an API gateway to trigger your funcation.<br>
+  * Lambda function: create a lambda function using python 3.12 as the runtime. No advanced settings are needed.<br>
+  * API gateway: set an API gateway to trigger your function.<br>
 
 ## Environment variables:<br>
 The following environment variables need to be set for the Lambda function to operate correctly:<br>
