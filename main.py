@@ -16,13 +16,16 @@ logging.basicConfig(level=logging.INFO)
 # Slack config
 slack_token = os.environ.get('SLACK_TOKEN')
 channel_id = os.environ['CHANNEL_ID']
+slack_domain = os.environ.get('SLACK_DOMAIN')
 slack_client = WebClient(token=slack_token)
 
 # Jira config
 jira_api_url = '/rest/api/2/issue'
-jira_host = 'yout.host.net'
-jira_username = 'your.user@mail.com.br'
+jira_host = os.environ.get('JIRA_HOST')
+jira_username = os.environ.get('JIRA_USERNAME')
 jira_token = os.environ.get('JIRA_TOKEN')
+project_key = os.environ.get('JIRA_PROJECT_KEY')
+issuetype_name = os.environ.get('JIRA_ISSUETYPE_NAME')
 
 # Auth header
 auth_string = f'{jira_username}:{jira_token}'
@@ -36,10 +39,10 @@ def create_jira_issue(summary, description):
     }
     payload = {
         'fields': {
-            'project': {'key': 'KEY'},
+            'project': {'key': project_key},
             'summary': summary,
             'description': description,
-            'issuetype': {'name': 'user story'}, #config this to any issuetype that is avaiable on your Jira Project
+            'issuetype': {'name': issuetype_name},
         }
     }
     
@@ -89,7 +92,7 @@ def send_slack_message(message, thread_ts=None, retries=3, delay=2):
 
 # Checks if there is already a card created for a specifc thread, avoiding duplicates        
 def check_existing_card(slack_thread_link):
-    query = f'project = KEY AND text ~ "{slack_thread_link}"'
+    query = f'project = {project_key} AND text ~ "{slack_thread_link}"'
     headers = {
         'Content-Type': 'application/json',
         'Authorization': f'Basic {auth_string_encoded}'
@@ -133,7 +136,7 @@ def validate_event(body):
         return{'statusCode': 200, 'body': json.dumps({'challenge': body['challenge']})}
     
     if 'event' in body and 'text' in body['event']:
-        return None #Valid event, no error
+        return None 
     else:
         logging.error('Event type not valid or lack of payload')
         return {'statusCode': 400, 'body': json.dumps({'error': 'Event type not valid or lack of payload'})}
@@ -143,10 +146,11 @@ def process_event(body):
     bot_id = os.environ['BOT_USER_ID']
     sender_id = body['event']['user']
     thread_ts = body['event'].get('thread_ts', body['event'].get('ts'))
-    permalink = f"https://domain.slack.com/archives/{channel_id}/p{thread_ts.replace('.', '')}"
+    permalink = f"https://{slack_domain}/archives/{channel_id}/p{thread_ts.replace('.', '')}"
+
 
     if sender_id != bot_id and 'thread_ts' not in body['event']:
-        description = f"{body['event']['text']} \nlink to slack thread: {permalink}"
+        description = f"{body['event']['text']} \n link to slack thread: {permalink}"
 
         try:
             message_timestamp = datetime.fromtimestamp(float(thread_ts))
@@ -184,6 +188,7 @@ def process_event(body):
         logging.error('Invalid sender or event lacks thread_ts')
         return{'statusCode': 400, 'body': json.dumps({'error':'Invalid sender or event lacks thread_ts'})}
     
+#Extracts first line to use as summary for the issue, if it can't get the first line, uses timestamp to form summary
 def extract_summary(text, formatted_timestamp):
     lines = text.split('\n')
     if lines and lines[0]:
