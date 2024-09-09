@@ -24,7 +24,7 @@ It is usefull to integrate slack channels that are used to notify alerts or inci
   * Slack OAuth Token: generate a token in your app settings.<br>
   * Scopes: OAuth scopes required for this project are chat:write, chat:read and channels:join.<br>
   * Event subscription: set up the Request URL in Slack to point to the AWS API Gateway endpoint that triggers this Lambda function, and subscripte to message.channels events.<br>
-
+<br>
 * AWS Lambda setup:<br>
   * Lambda function: create a lambda function with python 3.12 as runtime, no advanced settings are needed.<br>
   * API gateway: set an API gateway to trigger your funcation.<br>
