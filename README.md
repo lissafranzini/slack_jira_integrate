@@ -5,7 +5,7 @@ It is usefull for integrating slack channels used to notify alerts or incidents,
 <br>
 
 ## Features:<br>
-* Create Jira issue form message received in specific slack channel<br>
+* Creates Jira issue form message received in specific slack channel<br>
 * Checks if a Jira card already exists for the received event, avoiding duplicates<br>
 * Replies slack thread with the link to the newly created issue<br>
 * Uses first line of the message as the Jira issue's summary. If the first line can't be retrieved (e.g.: message is an image), it uses message timestamp as summary<br>
